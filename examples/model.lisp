@@ -1,9 +1,9 @@
 (clear-all)
 
-(define-model json-test
+(define-model json-test-original
 
   (sgp :jni-hostname "localhost" :jni-port 5555 :jni-sync t)
-  
+
   (chunk-type (fixation-cross (:include visual-object)))
   (chunk-type (letterobj (:include visual-object)) value letter)
   (chunk-type (background (:include visual-object)))
@@ -14,9 +14,9 @@
   (chunk-type oddball)
   (chunk-type respond start-quad start-color bg-color direction letter)
   (chunk-type quad quad clockwise counter-clockwise)
-  (chunk-type intro)
-  (chunk-type trial)
-  
+  (chunk-type intro state)
+  (chunk-type trial state)
+
   (add-dm
    (o-blue isa color-opposite color blue opposite red)
    (o-red isa color-opposite color red opposite blue)
@@ -26,11 +26,11 @@
    (quad2 isa quad quad 2 clockwise 3 counter-clockwise 1)
    (quad3 isa quad quad 3 clockwise 4 counter-clockwise 2)
    (quad4 isa quad quad 4 clockwise 1 counter-clockwise 3))
-  
-  (sgp :v t) 
+
+  (sgp :v t)
   (sgp :needs-mouse nil :process-cursor t)
   (start-hand-at-mouse)
-  
+
   (p find-x
      ?goal>
      buffer empty
@@ -44,7 +44,7 @@
      kind letterobj
      color red
      )
-  
+
   (p found-x
      ?goal>
      buffer empty
@@ -57,41 +57,47 @@
      ==>
      +goal>
      isa intro
+     state intro
      +manual>
      isa move-cursor
      loc =visual-location
      )
-  
+
   (p click-x
      =goal>
      isa intro
+     state intro
      ?manual>
-     preparation free
+     state free
      ==>
      +manual>
      isa click-mouse
      +goal>
      isa trial
+     state start
      -imaginal>
      )
-  
+
   (p start-trial
      =goal>
      isa trial
+     state start
      ?imaginal>
      buffer empty
      ?manual>
-     preparation free
+     state free
      ==>
      +goal>
      isa fixation-cross
+     state initial
      +manual>
      isa hand-to-home
      )
-  
+
   (p find-fixation-cross
      =goal>
      isa fixation-cross
+     state initial
      screen-pos nil
      ?visual-location>
      buffer empty
@@ -99,8 +105,8 @@
      +visual-location>
      isa visual-location
      kind fixation-cross
-     )  
-  
+     )
+
   (p found-fixation-cross
      =goal>
      isa fixation-cross
@@ -117,7 +123,7 @@
      isa move-attention
      screen-pos =visual-location
      )
-  
+
   (p attending-fixation-cross
      =goal>
      isa fixation-cross
@@ -134,7 +140,7 @@
      +goal>
      isa chunk
      )
-  
+
   (p find-bg
      =goal>
      isa chunk
@@ -148,7 +154,7 @@
      isa visual-location
      kind background
      )
-  
+
   (p found-bg
      =goal>
      isa chunk
@@ -164,7 +170,7 @@
      =imaginal>
      bg-color =bg-color
      )
-  
+
   (p find-color
      =goal>
      isa chunk
@@ -180,7 +186,7 @@
      isa visual-location
      kind letterobj
      )
-  
+
   (p found-color
      =goal>
      isa chunk
@@ -199,7 +205,7 @@
      found =color
      quad =quad
      )
-  
+
   (p find-same-color
      =goal>
      isa find-color
@@ -216,7 +222,7 @@
      color =color
      - value =quad
      )
-  
+
   (p found-same-color
      =visual-location>
      isa visual-location
@@ -236,7 +242,7 @@
      +goal>
      isa oddball
      )
-  
+
   (p found-no-same-color
      =goal>
      isa find-color
@@ -253,7 +259,7 @@
      +goal>
      isa chunk
      )
-  
+
   (p found-oddball
      =goal>
      isa oddball
@@ -269,7 +275,7 @@
      +goal>
      isa chunk
      )
-  
+
   (p get-direction
      =goal>
      isa chunk
@@ -285,7 +291,7 @@
      +goal>
      isa get-direction
      )
-  
+
   (p set-direction
      =goal>
      isa get-direction
@@ -302,7 +308,7 @@
      +goal>
      isa chunk
      )
-  
+
   (p start-responding
      =goal>
      isa chunk
@@ -320,7 +326,7 @@
      kind letterobj
      color =start-color
      )
-  
+
   (p set-start-quad
      =goal>
      isa chunk
@@ -344,7 +350,7 @@
      start-color =start-color
      start-quad =quad
      )
-  
+
   (p found-response-letter
      =goal>
      isa respond
@@ -357,7 +363,7 @@
      isa move-attention
      screen-pos =visual-location
      )
-  
+
   (p respond-letter
      =goal>
      isa respond
@@ -369,7 +375,7 @@
      letter =letter
      value =quad
      ?manual>
-     preparation free 
+     preparation free
      ==>
      +retrieval>
      isa quad
@@ -380,7 +386,7 @@
      =goal>
      letter =letter
      )
-  
+
   (p* get-next-response
       =goal>
       isa respond
@@ -399,7 +405,7 @@
       =goal>
       letter nil
       )
-  
+
   (p restart
      ?aural-location>
      buffer full
@@ -414,5 +420,5 @@
      -imaginal>
      -aural-location>
      )
-  
+
   )

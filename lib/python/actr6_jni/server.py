@@ -34,6 +34,7 @@ class ACTR_Protocol(LineReceiver):
 
 	def lineReceived(self, string):
 		obj = json.loads(string)
+		print obj
 		if obj['method'] == 'set-mp-time':
 			if self.factory.clock:
 				self.factory.clock.setTime(float(params[0]))
@@ -50,6 +51,7 @@ class ACTR_Protocol(LineReceiver):
 		self.sendCommand(obj['model'], "sync")
 
 	def sendCommand(self, model, method, **params):
+		print json.dumps({"model": model, "method": method, "params": params})
 		self.sendLine(json.dumps({"model": model, "method": method, "params": params}))
 
 class JNI_Server(Factory):
@@ -68,29 +70,31 @@ class JNI_Server(Factory):
 		self.p = ACTR_Protocol()
 		self.p.factory = self
 		return self.p
-	
+
 	def add_dm(self, chunk):
 		self.p.sendCommand(self.model, "add-dm", chunk=chunk.get_chunk())
 
 	def update_display(self, chunks, clear=False):
 		visual_locations = [chunk.get_visual_location() for chunk in chunks]
 		visual_objects = [chunk.get_visual_object() for chunk in chunks]
-		args = {"loc-chunks": visual_locations, 
+		args = {"loc-chunks": visual_locations,
 				"obj-chunks": visual_objects,
 				"clear": clear}
+		print args
 		self.p.sendCommand(self.model, "update-display", **args)
 
 	def display_new(self, chunks):
 		visual_locations = [chunk.get_visual_location() for chunk in chunks]
 		visual_objects = [chunk.get_visual_object() for chunk in chunks]
-		args = {"loc-chunks": visual_locations, 
+		args = {"loc-chunks": visual_locations,
 				"obj-chunks": visual_objects}
+		print args
 		self.p.sendCommand(self.model, "display-new", **args)
-		
+
 	def display_add(self, chunk):
 		visual_location = chunk.get_visual_location()
 		visual_object = chunk.get_visual_object()
-		args = {"loc-chunk": visual_location, 
+		args = {"loc-chunk": visual_location,
 				"obj-chunk": visual_object}
 		self.p.sendCommand(self.model, "display-add", **args)
 
@@ -100,11 +104,11 @@ class JNI_Server(Factory):
 		if name:
 			args = {"loc-chunk-name": name}
 			self.p.sendCommand(self.model, "display-remove", **args)
-		
+
 	def display_update(self, chunks, clear=False):
 		chunks = [chunk.get_visual_location() for chunk in chunks] + [chunk.get_visual_object() for chunk in chunks]
 		self.p.sendCommand(self.model, "display-update", chunks=chunks, clear=clear)
-		
+
 	def set_cursor_location(self, loc):
 		self.p.sendCommand(self.model, "set-cursor-loc", loc=loc)
 
@@ -125,9 +129,10 @@ class JNI_Server(Factory):
 
 	def disconnect(self):
 		self.p.sendCommand(self.model, "disconnect")
-		
+
 	def setup(self, width, height):
+		print 'width: %s, heigh: %s' % (width, height)
 		self.p.sendCommand(self.model, "setup", width=width, height=height)
-		
+
 	def trigger_event(self, event, *args):
 		self.p.sendCommand(self.model, "trigger-event", event=event, args=args)

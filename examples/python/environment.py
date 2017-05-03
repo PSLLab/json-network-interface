@@ -15,10 +15,10 @@ from random import sample, randint, choice
 import string
 
 ACTR6 = True
-try:
-    from actr6_jni import Dispatcher, JNI_Server, VisualChunk, Twisted_MPClock
-except ImportError:
-    ACTR6 = False
+#try:
+from actr6_jni import Dispatcher, JNI_Server, VisualChunk, Twisted_MPClock
+# except ImportError:
+#     ACTR6 = False
 
 class Letter(object):
 
@@ -42,7 +42,7 @@ class Letter(object):
                            letter=self.letter, value=self.quad)
 
 class Environment(object):
-    
+
     if ACTR6:
         d = Dispatcher()
 
@@ -68,7 +68,7 @@ class Environment(object):
         self.font = pygame.font.Font(pygame.font.match_font("Monospace", True), self.max_font_size / 5)
         self.spinner = ['|', '|', '/', '/', '-', '-', '\\', '\\']
         self.spinner_index = 0
-        
+
         self.intro_t = self.font.render("Click the red 'X' to start!", True, (0, 0, 0))
         self.intro_ts = self.intro_t.get_rect()
         self.intro_ts.center = self.screen_rect.center
@@ -163,7 +163,7 @@ class Environment(object):
         self.screen.blit(f, fs)
         self.spinner_index = (self.spinner_index + 1) % 8
         pygame.display.flip()
-        
+
     def draw_actr_wait_model(self):
         self.screen.fill((0, 255, 0))
         f = self.font.render("Waiting for ACT-R model", True, (0, 0, 0))
@@ -215,12 +215,13 @@ class Environment(object):
             self.draw_fixation()
         elif self.state == self.STATE_SEARCH:
             self.draw_search()
-            
+
     def handle_mouse_event(self, pos):
+        print "mouse clicked"
         if self.state == self.STATE_INTRO:
             if self.intro_xs.collidepoint(pos):
                 self.state = self.STATE_RESET
-                
+
     def handle_key_press(self, key, code):
         if key == pygame.K_ESCAPE:
             reactor.stop()
@@ -238,6 +239,7 @@ class Environment(object):
     def process_event(self):
         while True:
             for e in pygame.event.get():
+                print "got press"
                 if e.type == pygame.KEYDOWN:
                     self.handle_key_press(e.key, e.unicode)
                 elif e.type == pygame.MOUSEBUTTONDOWN:
@@ -266,7 +268,7 @@ class Environment(object):
             self.actr_time_lock = params['time-lock']
             self.setDefaultClock()
             self.state = self.STATE_WAIT_MODEL
-            
+
         @d.listen('model-run')
         def ACTR6_JNI_Event(self, model, params):
             if not params['resume']:
@@ -289,11 +291,11 @@ class Environment(object):
 
         @d.listen('mousemotion')
         def ACTR6_JNI_Event(self, model, params):
-            # Store "ACT-R" cursor in variable since we are 
+            # Store "ACT-R" cursor in variable since we are
             # not going to move the real mouse
             self.fake_cursor = params['loc']
 
-        @d.listen('mouseclick')
+        @d.listen('mousedown')
         def ACTR6_JNI_Event(self, model, params):
             # Simulate a button press using the "ACT-R" cursor loc
             self.handle_mouse_event(self.fake_cursor)
@@ -304,5 +306,5 @@ if __name__ == '__main__':
     pygame.font.init()
     pygame.mixer.init()
 
-    env = Environment(actr=True)
+    env = Environment(actr=ACTR6)
     reactor.run()
