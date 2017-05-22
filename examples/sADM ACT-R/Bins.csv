@@ -1,0 +1,5 @@
+BinColor,BinShape,BinSize,BinPitch,BinInstr,BinTempo,BinTexture,BinMaterial,BinConsistency
+Yellow,Octagon,Short,High,Horn,Slow,Rough,Rock,Solid
+Yellow,Square,Large,Low,Horn,Fast,Slimy,Plastic,Solid
+Purple,Square,Short,Low,Flute,Slow,Rough,Plastic,Gooey
+Purple,Octagon,Large,High,Flute,Fast,Slimy,Rock,Gooey
